@@ -8,4 +8,4 @@ export const logoutEndpoint = "/api/logout";
 export const getUserCredentialsEndpoint = "/api/user";
 
 export const groupsEndpoint = "/api/groups";
-export const addGroupEndpoint = "/api/add";
+export const addGroupEndpoint = "/api/addGroup";

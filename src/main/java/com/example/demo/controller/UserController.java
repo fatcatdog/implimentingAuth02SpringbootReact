@@ -45,7 +45,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/api/logout")
+    @PostMapping("/api/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         System.out.println("We are hitting our logout endpoint !!!!!!!");
         try {

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import { withCookies } from 'react-cookie';
-
-// import { getUserCredentialsEndpoint, loginEndpoint, githubLoginEndpoint, googleLoginEndpoint, logoutEndpoint } from '../constants';
-
 import { getUserCredentialsEndpoint, logoutEndpoint } from '../constants';
 
 function Home(props) {
@@ -36,7 +33,7 @@ function Home(props) {
       setAuthenticated(false)
     } else {
       console.log("Home - confirmAuthenticated() - body != null")
-      console.log(body)
+      // console.log(body)
       if(isJSON(body)){
         setUser(JSON.parse(body))
         setAuthenticated(true)
@@ -58,85 +55,96 @@ function Home(props) {
     }
   }
 
-  // async function logout(){
-  //   await fetch(logoutEndpoint, {method: 'POST', credentials: 'include',
-  //     headers: {'X-XSRF-TOKEN': csrfToken}}).then(res => res.json())
-  //   .then(response => {
-  //     console.log(response)
-  //     // window.location.href = response.logoutUrl + "?id_token_hint=" +
-  //     //   response.idToken + "&post_logout_redirect_uri=" + window.location.origin;
-  //   });
-  //
-  //   setCsrfToken('');
-  //   setAuthenticated(false);
-  //   setUser(undefined);
-  // }
-
   async function logout(){
-    const {cookies} = props;
+    // const {cookies} = props;
 
-    // console.log(csrfToken);
-    // console.log(cookies);
+    const response = await fetch(logoutEndpoint, {
+        method: 'POST',
+        headers: {
+          'X-XSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
 
-    const response = await fetch(logoutEndpoint, {method: 'GET', credentials: 'include',
-      headers: {'X-XSRF-TOKEN': csrfToken}})
 
     const body = await response.text();
 
-    console.log(body);
+    // console.log(body);
 
     setCsrfToken('');
     setAuthenticated(false);
     setUser(undefined);
   }
 
-  // async function logout(){
+  // function printUser(){
+  //   alert(JSON.stringify(user))
+  // }
   //
-  //   const response = await fetch("/", {method: 'POST', credentials: 'include'});
-  //   const body = await response.text();
-  //
-  //   console.log(body);
-  //
-  //   // await fetch(logoutEndpoint, {method: 'POST', credentials: 'include',
-  //   //   headers: {'X-XSRF-TOKEN': csrfToken}}).then(res => res.json())
-  //   //   .then(response => {
-  //   //     console.log(response)
-  //   //     window.location.href = response.logoutUrl + "?id_token_hint=" +
-  //   //       response.idToken + "&post_logout_redirect_uri=" + window.location.origin;
-  //   //   });
-  //
-  //   setCsrfToken('');
-  //   setAuthenticated(false);
-  //   setUser(undefined);
+  // function printToken(){
+  //   alert(csrfToken)
   // }
 
-
-  function printUser(){
-    alert(JSON.stringify(user))
+  function AuthenticatedUserView() {
+    return (
+        <div>
+          <Header />
+          <h1>Home</h1>
+          <br />
+            <button onClick={() => logout()}>Logout</button>
+          <br />
+        </div>
+    );
   }
 
-  function printToken(){
-    alert(csrfToken)
+  function UnauthenticatedUserView() {
+    return (
+        <div>
+          <Header />
+            <h1>Home</h1>
+          <br />
+            <button onClick={() => login()}>login</button>
+          <br />
+        </div>
+    );
   }
+
+  // function ConsoleLogging() {
+  //   return (
+  //       <div>
+  //         <br />
+  //           <button onClick={() => login()}>login</button>
+  //         <br />
+  //       </div>
+  //   );
+  // }
 
   useEffect(() => {
     confirmAuthenticated();
   }, []);
 
-  return(
-    <div>
-    <Header />
-    <h1>Home</h1>
-    <br />
-    <button onClick={() => login()}>login</button>
-    <br />
-    <button onClick={() => logout()}>Logout</button>
-    <br />
-    <button onClick={() => printUser()}>Print User</button>
-    <br />
-    <button onClick={() => printToken()}>Print Token</button>
-    </div>
-  )
+
+  if(authenticated){
+    return <AuthenticatedUserView />;
+  } else {
+    return <UnauthenticatedUserView />;
+  }
+
+  // return(
+  //   <div>
+  //   <Header />
+  //   <h1>Home</h1>
+  //   <br />
+  //   <button onClick={() => login()}>login</button>
+  //   <br />
+  //   <button onClick={() => logout()}>Logout</button>
+  //   <br />
+  //   <button onClick={() => printUser()}>Print User</button>
+  //   <br />
+  //   <button onClick={() => printToken()}>Print Token</button>
+  //   </div>
+  // )
 }
 
 export default withCookies(Home);
