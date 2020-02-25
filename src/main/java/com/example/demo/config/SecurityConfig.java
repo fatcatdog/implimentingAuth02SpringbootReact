@@ -19,17 +19,34 @@ import javax.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+////Matt Raibles's Okta tutorial config https://developer.okta.com/blog/2018/07/19/simple-crud-react-and-spring-boot
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .oauth2Login()
+                .and()
+//                .logout().logoutUrl("/api/logout").and()
+                .logout().and()
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .and()
+            .authorizeRequests()
+                .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
+                .antMatchers("/**/*.{js,html,css}").permitAll()
+                .antMatchers("/", "/api/user", "/api/logout").permitAll()
+                .anyRequest().authenticated();
+    }
+
+//// Spring Security tutorial config https://spring.io/guides/tutorials/spring-boot-oauth2/
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
-//        // @formatter:off
 //        http
 //            .authorizeRequests(a -> a
-////                .antMatchers("/").permitAll()
-//                .antMatchers("/", "/error", "/webjars/**").permitAll()
-//                .anyRequest().authenticated()
+//                    .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/", "/error", "/webjars/**", "/api/user").permitAll()
+//                    .anyRequest().authenticated()
 //            )
 //            .exceptionHandling(e -> e
-//                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+//                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 //            )
 //            .csrf(c -> c
 //                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -41,32 +58,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        // @formatter:on
 //    }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .oauth2Login().and()
-            .csrf()
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
-            .authorizeRequests()
-            .antMatchers("/**/*.{js,html,css}").permitAll()
-            .antMatchers("/", "/api/user").permitAll()
-            .anyRequest().authenticated();
-    }
-
-
     @Bean
     public RequestCache refererRequestCache() {
         return new HttpSessionRequestCache() {
             @Override
             public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
                 String referrer = request.getHeader("referer");
-
-                System.out.println("Original link");
+                String queryString = request.getQueryString();
+                System.out.println("referrer");
                 System.out.println(referrer);
+                System.out.println("queryString");
+                System.out.println(queryString);
+
 
                 if (referrer != null) {
-                    request.getSession().setAttribute("SPRING_SECURITY_SAVED_REQUEST", new SimpleSavedRequest(referrer));
+                    if(queryString != null){
+                        return;
+                    } else {
+                        request.getSession().setAttribute("SPRING_SECURITY_SAVED_REQUEST", new SimpleSavedRequest(referrer));
+                    }
+
                 }
             }
         };

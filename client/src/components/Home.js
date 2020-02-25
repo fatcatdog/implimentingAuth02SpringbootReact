@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import { withCookies } from 'react-cookie';
-import { getUserCredentialsEndpoint, loginEndpoint, githubLoginEndpoint, googleLoginEndpoint, logoutEndpoint } from '../constants';
+
+// import { getUserCredentialsEndpoint, loginEndpoint, githubLoginEndpoint, googleLoginEndpoint, logoutEndpoint } from '../constants';
+
+import { getUserCredentialsEndpoint, logoutEndpoint } from '../constants';
 
 function Home(props) {
 
@@ -9,56 +12,100 @@ function Home(props) {
   const [csrfToken, setCsrfToken] = useState('');
   const [user, setUser] = useState(undefined);
 
-  async function confirmAuthenticated(){
+  function isJSON(str) {
+      try {
+          return (JSON.parse(str) && !!str);
+      } catch (e) {
+          return false;
+      }
+  }
 
+  async function confirmAuthenticated(){
     const {cookies} = props;
 
     const response = await fetch(getUserCredentialsEndpoint, {credentials: 'include'});
     const body = await response.text();
     // let tempUser = JSON.parse(body);
+
     if (body === '') {
       console.log("Home - confirmAuthenticated() - body == null")
       setAuthenticated(false)
     } else {
       console.log("Home - confirmAuthenticated() - body != null")
       console.log(body)
-      setAuthenticated(true)
-      setUser(JSON.parse(body))
-      setCsrfToken(cookies.get('XSRF-TOKEN'));
+      if(isJSON(body)){
+        setUser(JSON.parse(body))
+        setAuthenticated(true)
+        setCsrfToken(cookies.get('XSRF-TOKEN'));
+      }
     }
   }
-
-  // async function login(){
-  //   const response = await fetch(loginEndpoint, {credentials: 'include'});
-  //   const body = await response.text();
-  //   // let tempUser = JSON.parse(body);
-  //   console.log("Home - confirmAuthenticated()")
-  //   console.log(body);
-  //   if (body === '') {
-  //     setAuthenticated(false)
-  //   } else {
-  //     setAuthenticated(true)
-  //     setUser(JSON.parse(body))
-  //   }
-  // }
 
   function login() {
-    let port = (window.location.port ? ':' + window.location.port : '');
-    if (port === ':3000') {
-      port = ':8080';
+    // if(typeof user === 'undefined'){
+    if(!authenticated){
+      let port = (window.location.port ? ':' + window.location.port : '');
+      if (port === ':3000') {
+        port = ':8080';
+      }
+      window.location.href = '//' + window.location.hostname + port + '/private';
+    } else {
+      alert("You are already logged in as: " + user.login);
     }
-    window.location.href = '//' + window.location.hostname + port + '/private';
   }
 
+  // async function logout(){
+  //   await fetch(logoutEndpoint, {method: 'POST', credentials: 'include',
+  //     headers: {'X-XSRF-TOKEN': csrfToken}}).then(res => res.json())
+  //   .then(response => {
+  //     console.log(response)
+  //     // window.location.href = response.logoutUrl + "?id_token_hint=" +
+  //     //   response.idToken + "&post_logout_redirect_uri=" + window.location.origin;
+  //   });
+  //
+  //   setCsrfToken('');
+  //   setAuthenticated(false);
+  //   setUser(undefined);
+  // }
+
   async function logout(){
-    fetch(logoutEndpoint, {method: 'POST', credentials: 'include',
-    headers: {'X-XSRF-TOKEN': csrfToken}}).then(res => res.json())
-    .then(response => {
-      console.log(response)
-      window.location.href = response.logoutUrl + "?id_token_hint=" +
-        response.idToken + "&post_logout_redirect_uri=" + window.location.origin;
-    });
+    const {cookies} = props;
+
+    // console.log(csrfToken);
+    // console.log(cookies);
+
+    const response = await fetch(logoutEndpoint, {method: 'GET', credentials: 'include',
+      headers: {'X-XSRF-TOKEN': csrfToken}})
+
+    const body = await response.text();
+
+    console.log(body);
+
+    setCsrfToken('');
+    setAuthenticated(false);
+    setUser(undefined);
   }
+
+  // async function logout(){
+  //
+  //   const response = await fetch("/", {method: 'POST', credentials: 'include'});
+  //   const body = await response.text();
+  //
+  //   console.log(body);
+  //
+  //   // await fetch(logoutEndpoint, {method: 'POST', credentials: 'include',
+  //   //   headers: {'X-XSRF-TOKEN': csrfToken}}).then(res => res.json())
+  //   //   .then(response => {
+  //   //     console.log(response)
+  //   //     window.location.href = response.logoutUrl + "?id_token_hint=" +
+  //   //       response.idToken + "&post_logout_redirect_uri=" + window.location.origin;
+  //   //   });
+  //
+  //   setCsrfToken('');
+  //   setAuthenticated(false);
+  //   setUser(undefined);
+  // }
+
 
   function printUser(){
     alert(JSON.stringify(user))
@@ -68,39 +115,6 @@ function Home(props) {
     alert(csrfToken)
   }
 
-  // async function loginWithGithub(){
-  //   const response = await fetch(githubLoginEndpoint, {credentials: 'include'});
-  //   const body = await response.text();
-  //   // let tempUser = JSON.parse(body);
-  //   console.log("Home - Github - confirmAuthenticated()")
-  //   console.log(body);
-  //   if (body === '') {
-  //     setAuthenticated(false)
-  //   } else {
-  //     setAuthenticated(true)
-  //     setUser(JSON.parse(body))
-  //   }
-  // }
-  //
-  // async function loginWithGoogle(){
-  //   const response = await fetch(googleLoginEndpoint, {credentials: 'include'});
-  //   const body = await response.text();
-  //   // let tempUser = JSON.parse(body);
-  //   console.log("Home - Google - confirmAuthenticated()")
-  //   console.log(body);
-  //   if (body === '') {
-  //     setAuthenticated(false)
-  //   } else {
-  //     setAuthenticated(true)
-  //     setUser(JSON.parse(body))
-  //   }
-  // }
-
-  // <button onClick={() => loginWithGithub()}>Login with GitHub</button>
-  // <br />
-  // <button onClick={() => loginWithGoogle()}>Login with GitHub</button>
-  // <br />
-  // <button onClick={() => logout()}>Logout</button>
   useEffect(() => {
     confirmAuthenticated();
   }, []);

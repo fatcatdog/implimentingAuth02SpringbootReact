@@ -4,6 +4,7 @@ import com.example.demo.model.Group;
 import com.example.demo.service.GroupService;
 //import io.swagger.annotations.Api;
 //import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-//@Api(value="Group REST API ")
+@Api(value="Group REST API ")
 @Controller
 @RequestMapping(path="/api")
 public class GroupController {
