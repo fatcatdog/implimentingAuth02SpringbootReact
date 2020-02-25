@@ -37,9 +37,9 @@ public class UserController {
     public ResponseEntity<?> getUser(@AuthenticationPrincipal OAuth2User user) {
 
         if (user == null) {
-            return new ResponseEntity<>("", HttpStatus.OK);
+            return new ResponseEntity<>("Something went wrong in /api/user?", HttpStatus.BAD_REQUEST);
         } else {
-            return ResponseEntity.ok().body(user.getAttributes());
+            return new ResponseEntity<>(user.getAttributes(), HttpStatus.OK);
         }
 
     }
@@ -49,10 +49,9 @@ public class UserController {
     public ResponseEntity<?> logout(HttpServletRequest request) {
         System.out.println("We are hitting our logout endpoint !!!!!!!");
         try {
-
             request.logout();
-//            new SecurityContextLogoutHandler().logout(request, null, null);
 //            request.getSession().invalidate();
+
             return new ResponseEntity<>("You logged out", HttpStatus.OK);
         } catch(Exception e) {
             System.out.println(e);

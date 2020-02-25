@@ -10,8 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.net.URISyntaxException;
 
 @Api(value="Group REST API ")
 @Controller
@@ -25,15 +30,16 @@ public class GroupController {
 
 //    @ApiOperation(value = "Add a Group")
     @CrossOrigin(origins = "*")
-    @PostMapping(path="/add", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> addNewGroup (@RequestBody Group group) {
-
+    @PostMapping(path="/addGroup", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> addNewGroup (@Valid @RequestBody Group group, @AuthenticationPrincipal OAuth2User principal) {
+        System.out.println("GroupController - addNewGroup..........");
         try {
             groupService.save(group);
             logger.info("GroupController - addNewGroup: " + group);
             return new ResponseEntity<>(HttpStatus.OK) ;
         } catch (Exception e) {
             logger.error("GroupController - addNewGroup: " + e);
+            System.out.println(e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

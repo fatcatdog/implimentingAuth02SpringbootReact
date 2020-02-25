@@ -31,14 +31,14 @@ public class Group {
     @Column(name = "description")
     private String description;
 
-    public Group(@NotNull Integer id, @NotNull String name, @NotNull String description) {
+    public Group(Integer id, String name, String description) {
         super();
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
-    public Group(@NotNull String name, @NotNull String description) {
+    public Group(String name, String description) {
         super();
         this.name = name;
         this.description = description;

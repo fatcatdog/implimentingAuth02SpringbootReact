@@ -24,8 +24,12 @@ function Home(props) {
     const {cookies} = props;
 
     const response = await fetch(getUserCredentialsEndpoint, {credentials: 'include'});
+
+    if(response.status === 400) {
+      console.log("400 indicates not logged in in browser && server")
+    }
+
     const body = await response.text();
-    // let tempUser = JSON.parse(body);
 
     if (body === '') {
       console.log("Home - confirmAuthenticated() - body == null")
