@@ -2,3 +2,14 @@
   list-style-type: none;
 
 }
+table{
+  margin: 0 auto; /* or margin: 0 auto 0 auto */
+  max-width: 800px;
+}
+table, th, td {
+  border: 1px solid black;
+}
+
+.mainClass {
+  text-align: center;
+}

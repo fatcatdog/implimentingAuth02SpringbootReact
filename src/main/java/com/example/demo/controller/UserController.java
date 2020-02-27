@@ -39,6 +39,7 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>("Something went wrong in /api/user?", HttpStatus.BAD_REQUEST);
         } else {
+
             return new ResponseEntity<>(user.getAttributes(), HttpStatus.OK);
         }
 

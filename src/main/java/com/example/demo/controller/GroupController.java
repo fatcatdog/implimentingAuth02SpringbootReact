@@ -33,6 +33,7 @@ public class GroupController {
     @PostMapping(path="/addGroup", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> addNewGroup (@Valid @RequestBody Group group, @AuthenticationPrincipal OAuth2User principal) {
         System.out.println("GroupController - addNewGroup..........");
+
         try {
             groupService.save(group);
             logger.info("GroupController - addNewGroup: " + group);

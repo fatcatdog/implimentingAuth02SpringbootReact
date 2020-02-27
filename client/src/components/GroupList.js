@@ -89,7 +89,7 @@ function GroupList(props) {
     );
 
   return(
-    <div>
+    <div className="mainClass">
     <Header />
     <h1>Group List</h1>
     <table>
