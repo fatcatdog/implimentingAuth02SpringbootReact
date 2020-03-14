@@ -5,6 +5,7 @@ import { CookiesProvider } from 'react-cookie';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Home from './components/Home';
 import GroupList from './components/GroupList';
+import Group from './components/Group';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Switch>
             <Route path='/' exact={true} component={Home}/>
             <Route path='/groups' exact={true} component={GroupList}/>
+            <Route path='/group' exact={true} component={Group}/>
           </Switch>
         </Router>
       </CookiesProvider>

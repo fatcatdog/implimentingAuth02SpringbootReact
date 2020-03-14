@@ -3,6 +3,7 @@ import Header from './Header';
 import { withCookies } from 'react-cookie';
 import { addGroupEndpoint, groupsEndpoint } from '../constants';
 import '../styles/GroupList.css';
+import { Link } from 'react-router-dom';
 
 
 function GroupList(props) {
@@ -58,12 +59,10 @@ function GroupList(props) {
   const [data, setData] = useState([]);
   const {cookies} = props;
 
-  const handleSubmit = (evt) => {
-        evt.preventDefault();
-
-        // console.log(`Submitting Name ${name}`)
-        // console.log(`Submitting Description ${description}`)
-        postOurObjToServer(cookies.get('XSRF-TOKEN'), name, description);
+  const handleSubmit = (evt) =>  {
+    evt.preventDefault();
+    console.log(evt)
+    postOurObjToServer(cookies.get('XSRF-TOKEN'), name, description);
   }
 
   useEffect(() => {
@@ -85,10 +84,16 @@ function GroupList(props) {
         <tr key={d.id}>
           <td>{d.name}</td>
           <td>{d.description}</td>
+          <td>
+            <Link to={{
+              pathname: "/group",
+              state: { ourId: d.id }
+            }}>Join</Link>
+         </td>
         </tr>
     );
 
-  return(
+  return (
     <div className="mainClass">
     <Header />
     <h1>Group List</h1>
@@ -97,16 +102,20 @@ function GroupList(props) {
       <tr>
         <th>Name</th>
         <th>Description</th>
+          <th>Group ID</th>
+
       </tr>
       {tableItems}
       </tbody>
     </table>
     <div>
       <h1>Create a Group</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={e => handleSubmit(e)}>
         <label>
           Name:
-          <input
+          <br />
+          <br />
+          <textarea className="field"
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
@@ -116,12 +125,16 @@ function GroupList(props) {
         <br />
         <label>
           Description:
-          <input
+          <br />
+          <br />
+          <textarea className="field"
             type="text"
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
         </label>
+        <br />
+        <br />
         <input type="submit" value="Submit" />
       </form>
     </div>

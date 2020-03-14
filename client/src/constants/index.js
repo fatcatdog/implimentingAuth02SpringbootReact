@@ -9,3 +9,6 @@ export const getUserCredentialsEndpoint = "/api/user";
 
 export const groupsEndpoint = "/api/groups";
 export const addGroupEndpoint = "/api/addGroup";
+export const getGroupEndpoint = "/api/group/";
+
+export const getMessageHistory = "/api/chatHistory";

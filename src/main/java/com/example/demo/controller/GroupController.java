@@ -5,6 +5,7 @@ import com.example.demo.service.GroupService;
 //import io.swagger.annotations.Api;
 //import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 @Api(value="Group REST API ")
 @Controller
@@ -28,7 +30,7 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
-//    @ApiOperation(value = "Add a Group")
+    @ApiOperation(value = "Add a Group")
     @CrossOrigin(origins = "*")
     @PostMapping(path="/addGroup", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> addNewGroup (@Valid @RequestBody Group group, @AuthenticationPrincipal OAuth2User principal) {
@@ -45,10 +47,10 @@ public class GroupController {
         }
     }
 
-//    @ApiOperation(value = "Get all groups")
+    @ApiOperation(value = "Get all groups")
     @CrossOrigin(origins = "*")
     @GetMapping(path = "/groups",  produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> getAllTasks() {
+    public ResponseEntity<?> getAllGroups() {
 
         try {
             Iterable<Group> tempGroups = groupService.getAllGroups();
@@ -61,6 +63,21 @@ public class GroupController {
         }
     }
 
+    @ApiOperation(value = "Get one group")
+    @CrossOrigin(origins = "*")
+    @GetMapping(path = "/group/{groupId}",  produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getOneGroup(@PathVariable(name="groupId") Integer groupId) {
 
+        try {
+            Optional<Group> tempGroup = groupService.getGroupById(groupId);
+            Group tempGroupObj = tempGroup.get();
+            logger.info("GroupController - getOneGroup: " + tempGroupObj);
+            return new ResponseEntity<>(tempGroupObj, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e);
+            logger.error("GroupController - getOneGroup: " + e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
