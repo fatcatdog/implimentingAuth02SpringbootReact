@@ -73,6 +73,7 @@ function Group(props) {
         console.log(message);
         message.content = "JOINED THE CHAT";
         addMessageToState(message);
+
       } else if (message.type === 'LEAVE') {
         console.log("message.type === 'LEAVE'");
         console.log(message);
@@ -92,7 +93,7 @@ function Group(props) {
       } else {
         console.log("Idk bruh")
       }
-      // scrollToBottom();
+      scrollToBottom();
   }
 
     function sendMessage(value){
@@ -181,6 +182,10 @@ function handleSendMessageSubmit(e) {
   setCurrentMessage("");
 }
 
+function scrollToBottom(){
+  messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+}
+
   return (
     <div className="BiggerContainer">
       <Header />
@@ -212,7 +217,7 @@ function handleSendMessageSubmit(e) {
         <h1>Public Chat</h1>
 
           <div className="Container">
-            <div className="MessageList">
+            <div className="MessageList"  ref={messagesEndRef}>
                 {messages.map(function(key, value){
                     return (
                         <div className="Message" key={value}>
