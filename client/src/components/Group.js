@@ -51,15 +51,6 @@ function Group(props) {
       }
   }
 
-  // function onConnected() {
-  //   // Subscribe to the Public Topic
-  //     // stompClient.subscribe("/topic/public", onMessageReceived(this));
-  //     stompClient.subscribe("/topic/public", onMessageReceived);
-  //
-  //     // Tell your username to the server
-  //     stompClient.send("/app/addUser", {}, JSON.stringify({sender: user.name, type: 'JOIN'}))
-  // }
-
   //this needs to be implimented
   function checkIfNameIsInArray(senderName){
     setMembers(members => [...members, senderName]);
@@ -190,21 +181,8 @@ function handleSendMessageSubmit(e) {
   setCurrentMessage("");
 }
 
-// function updateScrollbar() {
-//   $messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
-//     scrollInertia: 10,
-//     timeout: 0
-//   });
-// }
-
-  // function scrollToBottom(){
-  //   let objDiv = document.getElementById('messages');
-  //   objDiv.scrollTop = objDiv.scrollHeight;
-  // }
-
-
   return (
-    <div className="mainClass">
+    <div className="BiggerContainer">
       <Header />
       <h1>Group</h1>
       Group Name:
@@ -218,78 +196,53 @@ function handleSendMessageSubmit(e) {
       <br />
       <br />
     <div>
-      <div>
-       <div>
-             <form onSubmit={e => handleSubmit(e)}>
-               <div>
-                 Chatting as:{" "}{user.name}
-               </div>
-               <div>
-                   <button type="submit">Start Chatting</button>
-               </div>
-           </form>
-           <button onClick={() => printMessageHistory()}>Print Messages</button>
-     </div>
-   </div>
+       <form onSubmit={e => handleSubmit(e)}>
+         <div>
+           Chatting as:{" "}{user.name}
+         </div>
+         <div>
+             <button type="submit">Start Chatting</button>
+         </div>
+     </form>
+     <button onClick={() => printMessageHistory()}>Print Messages</button>
   </div>
 
 
       <div>
-          <div class="chat">
-            <div class="chat-title">
-              <h1>Public Chat</h1>
-            </div>
-            <div class="messages" ref={messagesEndRef}>
-              <div class="messages-content">
+        <h1>Public Chat</h1>
+
+          <div className="Container">
+            <div className="MessageList">
                 {messages.map(function(key, value){
                     return (
-                      <div>
-                        <div class="message message-personal">
-                        {key.sender} - {key.content}
-                        <br />
-                        <br />
+                        <div className="Message" key={value}>
+                          {key.sender && (
+                              <span className="author">{key.sender}:</span>
+                            )}
+                        {key.content}
                       </div>
-                     </div>
                     )
                   })}
-              </div>
             </div>
-            <div class="message-box">
-              <form onSubmit={e => handleSendMessageSubmit(e)}>
+            <div>
+              <form className="MessageForm" onSubmit={e => handleSendMessageSubmit(e)}>
 
-              <textarea type="text" class="message-input" value={currentMessage} onChange={e => setCurrentMessage(e.target.value)} />
-                <br />
-                <br />
-              <button type="submit" class="message-submit">Send</button>
-
+              <div className="input-container">
+              <input type="text" value={currentMessage} onChange={e => setCurrentMessage(e.target.value)}
+                 />
+              </div>
+              <div className="button-container">
+                <button type="submit">Send</button>
+              </div>
               </form>
             </div>
 
           </div>
-          <div class="bg"></div>
         </div>
 
     </div>
   )
 }
-// <div>
-//   <h1>Our Chat Box</h1>
-//
-//         {members.map(function(key, value){
-//            return (
-//              <div>
-//                {key}
-//              </div>
-//            )
-//          })}
-//
-//          {messages.map(function(key, value){
-//             return (
-//               <div>
-//                 {key.sender} - {key.content}
-//              </div>
-//             )
-//           })}
-// </div>
+
 
 export default withCookies(Group);
