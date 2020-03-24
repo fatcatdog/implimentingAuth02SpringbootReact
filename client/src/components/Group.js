@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Header.css';
+import '../styles/Group.css';
 import Header from './Header';
 import { getGroupEndpoint, getUserCredentialsEndpoint, getMessageHistory } from '../constants';
 import { withCookies } from 'react-cookie';
-// import * as Stomp from 'stompjs';
-// import * as SockJS from 'sockjs-client';
-// import Stomp from 'stompjs';
-// import SockJS from 'sockjs-client';
 
-var stompClient = null;
+////these are imported in the component
+// const Stomp = require('stompjs')
+// const SockJS = require('sockjs-client')
+
+let stompClient;
 
 function Group(props) {
   const [group, setGroup] = useState({});
@@ -18,74 +19,95 @@ function Group(props) {
   const [user, setUser] = useState("");
   const [currentMessage, setCurrentMessage] =useState("");
   const [messages, setMessages] = useState([]);
+  const [members, setMembers] = useState([]);
 
-  // const [channelConnected, setChannelConnected] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const messagesEndRef = useRef(null);
 
   function onError(){
       console.log("Failed connecting....")
   }
 
- // function connect(){
- //
- //    if(user.name) {
- //
- //      const Stomp = require('stompjs')
- //      var SockJS = require('sockjs-client')
- //      SockJS = new SockJS('/ws')
- //      stompClient = Stomp.over(SockJS);
- //      // stompClient.connect({}, onConnected(), onError());
- //      stompClient.connect({}, function(){
- //        // console.log( "Connected : " + frame);
- //        stompClient.subscribe('/topic/public', onMessageReceived(this));
- //        stompClient.send('/app/addUser', {}, JSON.stringify({ sender: user.name, type: 'JOIN' }))
- //
- //        }, function(error) {
- //          alert(error);
- //      });
- //    }
- //  }
+ const Stomp = require('stompjs')
+ const SockJS = require('sockjs-client')
 
- function connect(){
+  function connect() {
 
     if(user.name) {
-
-      const Stomp = require('stompjs')
-      var SockJS = require('sockjs-client')
-      SockJS = new SockJS('/ws')
-      stompClient = Stomp.over(SockJS);
-
-      // stompClient.connect({}, onConnected(), onError());
-      stompClient.connect({}, onConnected, onError);
-    }
-
+      var socket = new SockJS('/ws');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function(frame) {
+          setConnected(true);
+          console.log('Connected: ' + frame);
+          stompClient.send("/app/addUser", {}, JSON.stringify({sender: user.name, type: 'JOIN'}))
+          stompClient.subscribe('/topic/public', function(messagePayload) {
+            try {
+              onMessageReceived(messagePayload)
+            } catch(e) {
+              console.log(e)
+            }
+          });
+      });
+      }
   }
 
-  function onConnected() {
-    // Subscribe to the Public Topic
-      stompClient.subscribe('/topic/public', onMessageReceived);
+  // function onConnected() {
+  //   // Subscribe to the Public Topic
+  //     // stompClient.subscribe("/topic/public", onMessageReceived(this));
+  //     stompClient.subscribe("/topic/public", onMessageReceived);
+  //
+  //     // Tell your username to the server
+  //     stompClient.send("/app/addUser", {}, JSON.stringify({sender: user.name, type: 'JOIN'}))
+  // }
 
-      // Tell your username to the server
-      stompClient.send("/app/addUser",
-          {},
-          JSON.stringify({sender: user.name, type: 'JOIN'})
-      )
+  //this needs to be implimented
+  function checkIfNameIsInArray(senderName){
+    setMembers(members => [...members, senderName]);
   }
 
+  function addMessageToState(newMessage){
+   setMessages(messages => [...messages, newMessage]);
+ };
 
-  function printMessageHistory(){
-    console.log(messages);
+  function onMessageReceived(payload){
+    // console.log("Why the fuck is this not working?")
+    // console.log(typeof payload);
+    // console.log(JSON.stringify(payload))
+      let message = JSON.parse(payload.body);
+
+      checkIfNameIsInArray(message.sender);
+
+      if (message.type === 'JOIN') {
+        console.log("message.type === 'JOIN'");
+        console.log(message);
+        message.content = "JOINED THE CHAT";
+        addMessageToState(message);
+      } else if (message.type === 'LEAVE') {
+        console.log("message.type === 'LEAVE'");
+        console.log(message);
+        message.content = "LEFT THE CHAT";
+        addMessageToState(message);
+
+      } else if (message.type === 'TYPING') {
+        console.log("message.type === 'TYPING'");
+        console.log(message);
+        addMessageToState(message);
+
+      } else if (message.type === 'CHAT') {
+        console.log("message.type === 'CHAT'");
+        console.log(message);
+        addMessageToState(message);
+
+      } else {
+        console.log("Idk bruh")
+      }
+      // scrollToBottom();
   }
 
-  // function sendMessage(type, value){
     function sendMessage(value){
 
       if (stompClient) {
-        // var chatMessage = {
-        //   sender: this.state.username,
-        //   content: type === 'TYPING' ? value : value,
-        //   type: type
-        //
-        // };
+
         let chatMessage = {
           sender: user.name,
           content: value,
@@ -99,26 +121,9 @@ function Group(props) {
       }
   }
 
-function onMessageReceived(payload){
-    let message = JSON.parse(payload.body);
-
-    if (message.type === 'JOIN') {
-      console.log("message.type === 'JOIN'");
-      console.log(message);
-    } else if (message.type === 'LEAVE') {
-      console.log("message.type === 'LEAVE'");
-      console.log(message);
-    } else if (message.type === 'TYPING') {
-      console.log("message.type === 'TYPING'");
-      console.log(message);
-    } else if (message.type === 'CHAT') {
-      console.log("message.type === 'CHAT'");
-      console.log(message);
-    } else {
-      console.log("Idk bruh")
-    }
-}
-
+  function printMessageHistory(){
+    console.log(messages);
+  }
 
   useEffect(() => {
     confirmAuthenticated();
@@ -185,9 +190,18 @@ function handleSendMessageSubmit(e) {
   setCurrentMessage("");
 }
 
-const listMessages = messages.map((messageObject) =>
-  <li>{messageObject}</li>
-);
+// function updateScrollbar() {
+//   $messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
+//     scrollInertia: 10,
+//     timeout: 0
+//   });
+// }
+
+  // function scrollToBottom(){
+  //   let objDiv = document.getElementById('messages');
+  //   objDiv.scrollTop = objDiv.scrollHeight;
+  // }
+
 
   return (
     <div className="mainClass">
@@ -215,31 +229,67 @@ const listMessages = messages.map((messageObject) =>
                </div>
            </form>
            <button onClick={() => printMessageHistory()}>Print Messages</button>
-       </div>
+     </div>
    </div>
+  </div>
 
-   <div>
-       <div>
-           <ul>
-             {listMessages}
-           </ul>
-           <form onSubmit={e => handleSendMessageSubmit(e)}>
-               <div>
-                   <div>
-                     <textarea className="field"
-                       type="text"
-                       value={currentMessage}
-                       onChange={e => setCurrentMessage(e.target.value)}
-                     />
-                   </div>
-                     <input type="submit" value="Submit" />
-               </div>
-           </form>
-       </div>
-   </div>
-      </div>
+
+      <div>
+          <div class="chat">
+            <div class="chat-title">
+              <h1>Public Chat</h1>
+            </div>
+            <div class="messages" ref={messagesEndRef}>
+              <div class="messages-content">
+                {messages.map(function(key, value){
+                    return (
+                      <div>
+                        <div class="message message-personal">
+                        {key.sender} - {key.content}
+                        <br />
+                        <br />
+                      </div>
+                     </div>
+                    )
+                  })}
+              </div>
+            </div>
+            <div class="message-box">
+              <form onSubmit={e => handleSendMessageSubmit(e)}>
+
+              <textarea type="text" class="message-input" value={currentMessage} onChange={e => setCurrentMessage(e.target.value)} />
+                <br />
+                <br />
+              <button type="submit" class="message-submit">Send</button>
+
+              </form>
+            </div>
+
+          </div>
+          <div class="bg"></div>
+        </div>
+
     </div>
   )
 }
+// <div>
+//   <h1>Our Chat Box</h1>
+//
+//         {members.map(function(key, value){
+//            return (
+//              <div>
+//                {key}
+//              </div>
+//            )
+//          })}
+//
+//          {messages.map(function(key, value){
+//             return (
+//               <div>
+//                 {key.sender} - {key.content}
+//              </div>
+//             )
+//           })}
+// </div>
 
 export default withCookies(Group);

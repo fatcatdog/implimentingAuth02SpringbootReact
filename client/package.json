@@ -13,12 +13,8 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
-    "react-stomp": "^5.0.0",
-    "react-talk": "^1.0.0",
-    "sockjs": "^0.3.20",
     "sockjs-client": "^1.4.0",
-    "stompjs": "^2.3.3",
-    "websocket": "^1.0.31"
+    "stompjs": "^2.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
