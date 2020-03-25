@@ -30,30 +30,30 @@ public class ChatController {
 
 
     /*--------------------Private chat--------------------*/
-//    @Autowired
-//    private SimpMessagingTemplate simpMessagingTemplate;
-//
-//    @MessageMapping("/sendPrivateMessage")
-//    @SendTo("/queue/reply")
-//    public void sendPrivateMessage(@Payload ChatMessage chatMessage) {
-//
-//        System.out.println("ChatController sendPrivateMessage");
-//        System.out.println(chatMessage.toString());
-//
-//        simpMessagingTemplate.convertAndSendToUser(
-//                chatMessage.getReceiver().trim(), "/reply", chatMessage);
-//        //return chatMessage;
-//    }
-//
-//    @MessageMapping("/addPrivateUser")
-//    @SendTo("/queue/reply")
-//    public ChatMessage addPrivateUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-//        // Add user in web socket session
-//
-//        System.out.println("ChatController addPrivateUser");
-//        System.out.println(chatMessage.toString());
-//
-//        headerAccessor.getSessionAttributes().put("private-username", chatMessage.getSender());
-//        return chatMessage;
-//    }
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @MessageMapping("/sendPrivateMessage")
+    @SendTo("/queue/reply")
+    public void sendPrivateMessage(@Payload ChatMessage chatMessage) {
+
+        System.out.println("ChatController sendPrivateMessage");
+        System.out.println(chatMessage.toString());
+
+        simpMessagingTemplate.convertAndSendToUser(
+                chatMessage.getReceiver().trim(), "/reply", chatMessage);
+        //return chatMessage;
+    }
+
+    @MessageMapping("/addPrivateUser")
+    @SendTo("/queue/reply")
+    public ChatMessage addPrivateUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        // Add user in web socket session
+
+        System.out.println("ChatController addPrivateUser");
+        System.out.println(chatMessage.toString());
+
+        headerAccessor.getSessionAttributes().put("private-username", chatMessage.getSender());
+        return chatMessage;
+    }
 }

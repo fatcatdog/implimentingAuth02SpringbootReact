@@ -25,7 +25,7 @@ function Group(props) {
   const [connected, setConnected] = useState(false);
   const messagesEndRef = useRef(null);
   const textInputRef = useRef(null);
-  const [userJustClickedJoinRoom, setUserJustClickedJoinRoom] = useState(false);
+  // const [userJustClickedJoinRoom, setUserJustClickedJoinRoom] = useState(false);
 
   function onError(){
       console.log("Failed connecting....")
@@ -34,14 +34,52 @@ function Group(props) {
  const Stomp = require('stompjs')
  const SockJS = require('sockjs-client')
 
+ function OurChatJoinLeaveButtons(connected){
+
+     // if(userJustClickedJoinRoom){
+     //   return (<div>Loading...</div>);
+     // }
+
+     if(connected){
+       return (
+         <form onSubmit={e => sendLeaveMessage(e)}>
+           <button type="submit">Leave chat Room</button>
+         </form>
+       )
+     } else {
+       return (
+         <form onSubmit={e => handleSubmit(e)}>
+           <button type="submit">Join chat room</button>
+         </form>
+      )
+     }
+     }
+
+   // function functionToSetClickTrue(e){
+   //   e.preventDefault();
+   //   setUserJustClickedJoinRoom(true);
+   //    connect();
+   //   console.log("Hopefully this executes only once!")
+   //
+   // }
+
+   function handleSubmit(e) {
+     e.preventDefault();
+     // setUserJustClickedJoinRoom(true);
+     // OurChatJoinLeaveButtons.useState();
+     // console.log("ooooy " + userJustClickedJoinRoom)
+     connect();
+     textInputRef.current.focus()
+   }
+
   function connect() {
-    setUserJustClickedJoinRoom(true);
+    // setUserJustClickedJoinRoom(true);
     if(user.name) {
       var socket = new SockJS('/ws');
       stompClient = Stomp.over(socket);
       stompClient.connect({}, function(frame) {
           setConnected(true);
-          setUserJustClickedJoinRoom(false);
+          // setUserJustClickedJoinRoom(false);
           // console.log('Connected: ' + frame);
           stompClient.send("/app/addUser", {}, JSON.stringify({sender: user.name, type: 'JOIN'}))
           stompClient.subscribe('/topic/public', function(messagePayload) {
@@ -50,12 +88,12 @@ function Group(props) {
             } catch(e) {
               console.log(e)
               setConnected(false);
-              setUserJustClickedJoinRoom(false);
+              // setUserJustClickedJoinRoom(false);
             }
           });
       });
       }
-      setUserJustClickedJoinRoom(false);
+      // setUserJustClickedJoinRoom(false);
   }
 
   // //this needs to be implimented
@@ -199,14 +237,6 @@ function onError() {
   console.log("Could not connect to WebSocket server. Please refresh this page to try again!");
 }
 
-function handleSubmit(e) {
-  e.preventDefault();
-  setUserJustClickedJoinRoom(true);
-  console.log("ooooy " + userJustClickedJoinRoom)
-  connect();
-  textInputRef.current.focus()
-}
-
 function handleSendMessageSubmit(e) {
   e.preventDefault();
   if(currentMessage.trim().length === 0) {
@@ -249,33 +279,19 @@ const OurStatusIndicator = (connected) => {
     }
 }
 
-const OurChatJoinLeaveButtons = (connected) => {
-
-    if(connected){
-      return (
-        <form onSubmit={e => sendLeaveMessage(e)}>
-          <button type="submit">Leave chat Room</button>
-        </form>
-      )
-    } else {
-      return (
-        <form onSubmit={e => handleSubmit(e)}>
-          <button type="submit">Join chat room</button>
-        </form>
-     )
-    }
-    }
-
   return (
     <div>
       <div className="centeringStuff">
+        {
+          // We wrap the header in this to try close any websockets upon leaving chat room (whether they were open or not)
+        }
         <div onClick={e => sendLeaveMessage(e)}>
       <Header />
         <br />
         <br />
       </div>
     <div>
-      {OurChatJoinLeaveButtons(connected)}
+       {OurChatJoinLeaveButtons(connected)}
   </div>
 </div>
 
