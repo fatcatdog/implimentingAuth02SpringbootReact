@@ -4,6 +4,7 @@ import '../styles/Group.css';
 import Header from './Header';
 import { getGroupEndpoint, getUserCredentialsEndpoint, getMessageHistory } from '../constants';
 import { withCookies } from 'react-cookie';
+import { Redirect } from "react-router-dom";
 
 ////these are imported in the component
 // const Stomp = require('stompjs')
@@ -19,10 +20,12 @@ function Group(props) {
   const [user, setUser] = useState("");
   const [currentMessage, setCurrentMessage] =useState("");
   const [messages, setMessages] = useState([]);
-  const [members, setMembers] = useState([]);
+  // const [members, setMembers] = useState([]);
 
   const [connected, setConnected] = useState(false);
   const messagesEndRef = useRef(null);
+  const textInputRef = useRef(null);
+  const [userJustClickedJoinRoom, setUserJustClickedJoinRoom] = useState(false);
 
   function onError(){
       console.log("Failed connecting....")
@@ -32,41 +35,43 @@ function Group(props) {
  const SockJS = require('sockjs-client')
 
   function connect() {
-
+    setUserJustClickedJoinRoom(true);
     if(user.name) {
       var socket = new SockJS('/ws');
       stompClient = Stomp.over(socket);
       stompClient.connect({}, function(frame) {
           setConnected(true);
-          console.log('Connected: ' + frame);
+          setUserJustClickedJoinRoom(false);
+          // console.log('Connected: ' + frame);
           stompClient.send("/app/addUser", {}, JSON.stringify({sender: user.name, type: 'JOIN'}))
           stompClient.subscribe('/topic/public', function(messagePayload) {
             try {
               onMessageReceived(messagePayload)
             } catch(e) {
               console.log(e)
+              setConnected(false);
+              setUserJustClickedJoinRoom(false);
             }
           });
       });
       }
+      setUserJustClickedJoinRoom(false);
   }
 
-  //this needs to be implimented
-  function checkIfNameIsInArray(senderName){
-    setMembers(members => [...members, senderName]);
-  }
+  // //this needs to be implimented
+  // function checkIfNameIsInArray(senderName){
+  //   setMembers(members => [...members, senderName]);
+  // }
 
   function addMessageToState(newMessage){
    setMessages(messages => [...messages, newMessage]);
  };
 
   function onMessageReceived(payload){
-    // console.log("Why the fuck is this not working?")
-    // console.log(typeof payload);
-    // console.log(JSON.stringify(payload))
+
       let message = JSON.parse(payload.body);
 
-      checkIfNameIsInArray(message.sender);
+      // checkIfNameIsInArray(message.sender);
 
       if (message.type === 'JOIN') {
         console.log("message.type === 'JOIN'");
@@ -113,13 +118,37 @@ function Group(props) {
       }
   }
 
+  function sendLeaveMessage(e){
+    e.preventDefault();
+
+    if (stompClient) {
+
+      let chatMessage = {
+        sender: user.name,
+        content: "",
+        type: "LEAVE"
+      };
+
+      // send public message
+      stompClient.send("/app/sendMessage", {}, JSON.stringify(chatMessage));
+      stompClient.disconnect(function () {
+        console.log("Killed websocket connection.")
+      })
+      stompClient = null;
+      setConnected(false);
+    } else {
+      console.log("function sendMessage stompClient is null....")
+    }
+}
+
   function printMessageHistory(){
     console.log(messages);
   }
 
   useEffect(() => {
     confirmAuthenticated();
-    getGroupFromBackend(props.location.state.ourId);
+    let newVar = props.location.state.ourId;
+    getGroupFromBackend(newVar);
   }, []);
 
   async function getGroupFromBackend(aNewGroupId){
@@ -172,52 +201,95 @@ function onError() {
 
 function handleSubmit(e) {
   e.preventDefault();
+  setUserJustClickedJoinRoom(true);
+  console.log("ooooy " + userJustClickedJoinRoom)
   connect();
+  textInputRef.current.focus()
 }
 
 function handleSendMessageSubmit(e) {
   e.preventDefault();
-  // console.log(currentMessage);
-  sendMessage(currentMessage);
-  setCurrentMessage("");
+  if(currentMessage.trim().length === 0) {
+      let newFakeMessage = {};
+      newFakeMessage.sender = "BOT (only you can see this)";
+      newFakeMessage.type = "CHAT";
+      newFakeMessage.content = "Your message was empty. Try typing something!"
+      addMessageToState(newFakeMessage)
+  } else if (connected === false){
+      let newFakeMessage = {};
+      newFakeMessage.sender = "BOT (only you can see this)";
+      newFakeMessage.type = "CHAT";
+      newFakeMessage.content = "Something isn't right. Please try clicking the Connect to Chat button";
+      addMessageToState(newFakeMessage)
+  } else {
+      sendMessage(currentMessage);
+      setCurrentMessage("");
+  }
+
+  textInputRef.current.focus();
 }
 
 function scrollToBottom(){
   messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
 }
 
+const OurStatusIndicator = (connected) => {
+    if(connected){
+      return (
+       <div>
+         Connected status:{" "}<div className="greenCircleStyle"></div>
+       </div>
+      )
+    } else {
+      return (
+       <div>
+         Connected status:{" "}<div className="redCircleStyle"></div>
+       </div>
+     )
+    }
+}
+
+const OurChatJoinLeaveButtons = (connected) => {
+
+    if(connected){
+      return (
+        <form onSubmit={e => sendLeaveMessage(e)}>
+          <button type="submit">Leave chat Room</button>
+        </form>
+      )
+    } else {
+      return (
+        <form onSubmit={e => handleSubmit(e)}>
+          <button type="submit">Join chat room</button>
+        </form>
+     )
+    }
+    }
+
   return (
-    <div className="BiggerContainer">
-      <Header />
-      <h1>Group</h1>
-      Group Name:
-      <br />
-      {group.name}
-      <br />
-      <br />
-      Group Description:
-      <br />
-      {group.description}
-      <br />
-      <br />
     <div>
-       <form onSubmit={e => handleSubmit(e)}>
-         <div>
-           Chatting as:{" "}{user.name}
-         </div>
-         <div>
-             <button type="submit">Start Chatting</button>
-         </div>
-     </form>
-     <button onClick={() => printMessageHistory()}>Print Messages</button>
+      <div className="centeringStuff">
+        <div onClick={e => sendLeaveMessage(e)}>
+      <Header />
+        <br />
+        <br />
+      </div>
+    <div>
+      {OurChatJoinLeaveButtons(connected)}
   </div>
+</div>
 
 
       <div>
-        <h1>Public Chat</h1>
-
+        <div className="centeringStuff">
+          <h2>{group.name}</h2>
+          <h4>{group.description}</h4>
+          <h2>Chatting as:{" "}{user.name}</h2>
+          {OurStatusIndicator(connected)}
+        </div>
+        <br />
           <div className="Container">
-            <div className="MessageList"  ref={messagesEndRef}>
+            <div className="MessageList" ref={messagesEndRef}>
                 {messages.map(function(key, value){
                     return (
                         <div className="Message" key={value}>
@@ -230,22 +302,24 @@ function scrollToBottom(){
                   })}
             </div>
             <div>
-              <form className="MessageForm" onSubmit={e => handleSendMessageSubmit(e)}>
+               <form className="MessageForm" onSubmit={e => handleSendMessageSubmit(e)}>
 
-              <div className="input-container">
-              <input type="text" value={currentMessage} onChange={e => setCurrentMessage(e.target.value)}
-                 />
-              </div>
-              <div className="button-container">
-                <button type="submit">Send</button>
-              </div>
-              </form>
-            </div>
-
+               <div className="input-container">
+               <input
+                 type="text"
+                 value={currentMessage}
+                 onChange={e => setCurrentMessage(e.target.value)}
+                 ref={textInputRef}
+                />
+               </div>
+               <div className="button-container">
+                 <button type="submit">Send</button>
+               </div>
+               </form>
+             </div>
           </div>
         </div>
-
-    </div>
+      </div>
   )
 }
 
