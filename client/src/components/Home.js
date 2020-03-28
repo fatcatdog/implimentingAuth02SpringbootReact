@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
+import EveryonePublicChat from './EveryonePublicChat';
 import { withCookies } from 'react-cookie';
 import { getUserCredentialsEndpoint, logoutEndpoint } from '../constants';
 import '../styles/Home.css';
@@ -106,10 +107,8 @@ function Home(props) {
     // let user = user;
     if(newVar.login !== undefined){
       return (
-        <div className="mainClass">
-            <Header />
-            <h1>Home</h1>
-            <h2>Home</h2>
+        <div>
+            <EveryonePublicChat />
             <br />
               <button onClick={() => logout()}>Logout from {newVar.login}</button>
             <br />
@@ -117,10 +116,9 @@ function Home(props) {
       );
     } else if(newVar.given_name !== undefined){
       return (
-        <div className="mainClass">
-            <Header />
-            <h1>Home</h1>
-            <h2>Home</h2>
+        <div>
+              <EveryonePublicChat />
+
             <br />
               <button onClick={() => logout()}>Logout from {newVar.given_name}</button>
             <br />
@@ -128,10 +126,9 @@ function Home(props) {
       );
     } else {
       return (
-        <div className="mainClass">
-            <Header />
-            <h1>Home</h1>
-            <h2>Home</h2>
+        <div>
+            <EveryonePublicChat />
+
             <br />
               <button onClick={() => logout()}>Logout</button>
             <br />

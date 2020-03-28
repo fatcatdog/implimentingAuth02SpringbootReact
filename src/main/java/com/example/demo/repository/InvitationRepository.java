@@ -11,4 +11,5 @@ import java.util.List;
 public interface InvitationRepository extends CrudRepository<Invitation, Integer> {
     List<Invitation> findBySendee(String sendee);
 
+    List<Invitation> findBySender(String sender);
 }

@@ -9,6 +9,8 @@ function Header() {
     <button><Link to="/">Home</Link></button>
     <br/>
     <button><Link to="/groups">Groups</Link></button>
+    <br/>
+    <button><Link to="/invitations">Invitations</Link></button>
     </div>
   )
 }

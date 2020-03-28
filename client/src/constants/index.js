@@ -12,3 +12,9 @@ export const addGroupEndpoint = "/api/addGroup";
 export const getGroupEndpoint = "/api/group/";
 
 export const getMessageHistory = "/api/chatHistory";
+
+export const getInvitationsSendeeEndpoint = "/api/invitations/sendee/";
+export const getInvitationsSenderEndpoint = "/api/invitations/sender/";
+
+export const updateAnInvitationEndpoint = "/api/invitations/update";
+export const addAnInvitationEndpoint = "/api/invitations/add";

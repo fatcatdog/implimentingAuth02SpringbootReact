@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invitation_table")
@@ -27,20 +28,33 @@ public class Invitation {
 
     @JsonProperty
     @NotNull
-    @Column(name = "accepted")
-    private String accepted;
+    @Column(name = "status")
+    private boolean status;
 
-    public Invitation(@NotNull Integer id, @NotNull String sender, @NotNull String sendee, @NotNull String accepted) {
+    @JsonProperty
+    @NotNull
+    @Column(name = "dateTime")
+    private LocalDateTime dateTime=LocalDateTime.now();;
+
+    public Invitation(@NotNull Integer id, @NotNull String sender, @NotNull String sendee, @NotNull boolean status, @NotNull LocalDateTime dateTime) {
+        super();
         this.id = id;
         this.sender = sender;
         this.sendee = sendee;
-        this.accepted = accepted;
+        this.status = status;
+        this.dateTime = dateTime;
     }
 
-    public Invitation(@NotNull String sender, @NotNull String sendee, @NotNull String accepted) {
+    public Invitation(@NotNull String sender, @NotNull String sendee) {
+        super();
         this.sender = sender;
         this.sendee = sendee;
-        this.accepted = accepted;
+        this.status = false;
+        this.dateTime = dateTime;
+    }
+
+    public Invitation() {
+        super();
     }
 
     public Integer getId() {
@@ -67,21 +81,19 @@ public class Invitation {
         this.sendee = sendee;
     }
 
-    public String getAccepted() {
-        return accepted;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setAccepted(String accepted) {
-        this.accepted = accepted;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "Invitation{" +
-                "id=" + id +
-                ", sender='" + sender + '\'' +
-                ", sendee='" + sendee + '\'' +
-                ", accepted='" + accepted + '\'' +
-                '}';
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }

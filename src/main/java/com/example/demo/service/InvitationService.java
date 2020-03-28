@@ -27,8 +27,11 @@ public class InvitationService {
         invitationRepository.save(invitation);
     }
 
-    public Iterable<Invitation> getAllInvitationsForUser(String sendee)  {
+    public Iterable<Invitation> getAllInvitationsForSendee(String sendee)  {
         return invitationRepository.findBySendee(sendee);
     }
 
+    public Iterable<Invitation> getAllInvitationsForSender(String sender)  {
+        return invitationRepository.findBySender(sender);
+    }
 }

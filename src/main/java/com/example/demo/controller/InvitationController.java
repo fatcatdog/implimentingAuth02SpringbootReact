@@ -45,18 +45,34 @@ public class InvitationController {
         }
     }
 
-    @ApiOperation(value = "Get all invitations for user")
+    @ApiOperation(value = "Get all invitations for sendee")
     @CrossOrigin(origins = "*")
-    @GetMapping(path = "/invitations/{invitationSendee}",  produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> getInvitationsForUser(@PathVariable(name="invitationSendee") String invitationSendee) {
+    @GetMapping(path = "/invitations/sendee/{invitationSendee}",  produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getInvitationsForSendee(@PathVariable(name="invitationSendee") String invitationSendee) {
 
         try {
-            Iterable<Invitation> tempInvitations = invitationService.getAllInvitationsForUser(invitationSendee);
-            logger.info("InvitationController - getInvitationsForUser: " + tempInvitations);
+            Iterable<Invitation> tempInvitations = invitationService.getAllInvitationsForSendee(invitationSendee);
+            logger.info("InvitationController - getInvitationsForSendee: " + tempInvitations);
             return new ResponseEntity<>(tempInvitations, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e);
-            logger.error("InvitationController - getInvitationsForUser: " + e);
+            logger.error("InvitationController - getInvitationsForSendee: " + e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "Get all invitations for sender")
+    @CrossOrigin(origins = "*")
+    @GetMapping(path = "/invitations/sender/{invitationSender}",  produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getInvitationsForSender(@PathVariable(name="invitationSender") String invitationSender) {
+
+        try {
+            Iterable<Invitation> tempInvitations = invitationService.getAllInvitationsForSender(invitationSender);
+            logger.info("InvitationController - getInvitationsForSender: " + tempInvitations);
+            return new ResponseEntity<>(tempInvitations, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e);
+            logger.error("InvitationController - getInvitationsForSender: " + e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
