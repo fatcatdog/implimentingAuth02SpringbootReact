@@ -109,19 +109,25 @@ function Home(props) {
       return (
         <div>
             <EveryonePublicChat />
+              <div className="mainClass">
+
             <br />
               <button onClick={() => logout()}>Logout from {newVar.login}</button>
             <br />
           </div>
+        </div>
+
       );
     } else if(newVar.given_name !== undefined){
       return (
         <div>
               <EveryonePublicChat />
 
+              <div className="mainClass">
             <br />
               <button onClick={() => logout()}>Logout from {newVar.given_name}</button>
             <br />
+            </div>
           </div>
       );
     } else {

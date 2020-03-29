@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "invitation_table")
-public class Invitation {
+public class Contact {
 
     @JsonProperty
     @Id
@@ -28,32 +28,25 @@ public class Invitation {
 
     @JsonProperty
     @NotNull
-    @Column(name = "status")
-    private boolean status;
+    @Column(name = "date")
+    private Date date = new Date();
 
-    @JsonProperty
-    @NotNull
-    @Column(name = "dateTime")
-    private LocalDateTime dateTime=LocalDateTime.now();;
-
-    public Invitation(@NotNull Integer id, @NotNull String sender, @NotNull String sendee, @NotNull boolean status, @NotNull LocalDateTime dateTime) {
+    public Contact(@NotNull Integer id, @NotNull String sender, @NotNull String sendee, @NotNull Date date) {
         super();
         this.id = id;
         this.sender = sender;
         this.sendee = sendee;
-        this.status = status;
-        this.dateTime = dateTime;
+        this.date = date;
     }
 
-    public Invitation(@NotNull String sender, @NotNull String sendee) {
+    public Contact(@NotNull String sender, @NotNull String sendee) {
         super();
         this.sender = sender;
         this.sendee = sendee;
-        this.status = false;
-        this.dateTime = dateTime;
+        this.date = date;
     }
 
-    public Invitation() {
+    public Contact() {
         super();
     }
 
@@ -81,19 +74,11 @@ public class Invitation {
         this.sendee = sendee;
     }
 
-    public boolean isStatus() {
-        return status;
+    public Date getDate() {
+        return date;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

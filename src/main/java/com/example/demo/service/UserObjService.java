@@ -25,6 +25,17 @@ public class UserObjService {
         return userObjRepository.findAll();
     }
 
+    public String checkIfUserExists(String name){
+
+        Optional<UserObj> tempUser = userObjRepository.findByName(name);
+
+        if(tempUser.isPresent()){
+            return tempUser.get().getProfilePicUrl();
+        } else {
+            return "User not found";
+        }
+    }
+
     @Transactional
     public void saveUser(OAuth2User user) {
 

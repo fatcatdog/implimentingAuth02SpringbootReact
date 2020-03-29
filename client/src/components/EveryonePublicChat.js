@@ -13,7 +13,6 @@ import { Redirect } from "react-router-dom";
 let stompClient;
 
 function EveryonePublicChat(props) {
-  const [group, setGroup] = useState({});
   const {cookies} = props;
   const [authenticated, setAuthenticated] = useState(false);
   const [csrfToken, setCsrfToken] = useState('');
@@ -190,28 +189,6 @@ function EveryonePublicChat(props) {
     // getGroupFromBackend(newVar);
   }, []);
 
-  async function getGroupFromBackend(aNewGroupId){
-    const response = await fetch(getGroupEndpoint + aNewGroupId, {
-      method: 'GET',
-      headers: {
-        'X-XSRF-TOKEN': cookies.get('XSRF-TOKEN'),
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    });
-
-    try {
-      let textBody = await response.text();
-      let jsonBody = JSON.parse(textBody);
-      setGroup(jsonBody)
-    } catch(e) {
-      console.log("Error getting group")
-      console.log(e)
-   }
-
-  }
-
   async function confirmAuthenticated(){
     const {cookies} = props;
 
@@ -297,8 +274,6 @@ const OurStatusIndicator = (connected) => {
 
       <div>
         <div className="centeringStuff">
-          <h2>{group.name}</h2>
-          <h4>{group.description}</h4>
           <h2>Chatting as:{" "}{user.name}</h2>
           {OurStatusIndicator(connected)}
         </div>

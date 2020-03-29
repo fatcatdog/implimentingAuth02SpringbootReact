@@ -10,7 +10,7 @@ function Header() {
     <br/>
     <button><Link to="/groups">Groups</Link></button>
     <br/>
-    <button><Link to="/invitations">Invitations</Link></button>
+    <button><Link to="/contacts">Contacts</Link></button>
     </div>
   )
 }

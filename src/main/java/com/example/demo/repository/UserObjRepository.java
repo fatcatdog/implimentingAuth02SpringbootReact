@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface UserObjRepository extends CrudRepository<UserObj, Integer> {
     Optional<UserObj> findByPrincipalName(String principalName);
+    Optional<UserObj> findByName(String name);
+
 }

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping(path="/api")
 public class UserController {
 
 //    @GetMapping("/api/login")
@@ -38,8 +39,29 @@ public class UserController {
 //        }
 //    }
 
+    @CrossOrigin(origins = "*")
+    @ApiOperation(value = "Check if user principal is valid")
+    @GetMapping(path = "/user/{name}",  produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> checkIfRealUser(@PathVariable(name="name") String name) {
+        System.out.println("Check if user principal is valid!!!!!!");
+
+        try {
+            String userPresentPicUrl = userObjService.checkIfUserExists(name);
+
+            if(userPresentPicUrl.equals("User not found")) {
+                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(userPresentPicUrl, HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return new ResponseEntity<>("Something went wrong trying to get user obj", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ApiOperation(value = "Get User + save user")
-    @GetMapping("/api/user")
+    @GetMapping("/user")
     public ResponseEntity<?> getUser(@AuthenticationPrincipal OAuth2User user) {
 
         if (user == null) {
