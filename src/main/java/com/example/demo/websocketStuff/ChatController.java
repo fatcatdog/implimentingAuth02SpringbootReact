@@ -30,6 +30,7 @@ public class ChatController {
 
 
     /*--------------------Private chat--------------------*/
+
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -40,8 +41,7 @@ public class ChatController {
         System.out.println("ChatController sendPrivateMessage");
         System.out.println(chatMessage.toString());
 
-        simpMessagingTemplate.convertAndSendToUser(
-                chatMessage.getReceiver().trim(), "/reply", chatMessage);
+        simpMessagingTemplate.convertAndSendToUser(chatMessage.getReceiver().trim(), "/reply", chatMessage);
         //return chatMessage;
     }
 

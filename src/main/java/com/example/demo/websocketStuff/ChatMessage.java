@@ -7,7 +7,7 @@ public class ChatMessage {
     private String content;
     private String sender;
     private String receiver;
-    private LocalDateTime dateTime=LocalDateTime.now();;
+    private LocalDateTime dateTime=LocalDateTime.now();
 
     public enum MessageType {
         CHAT,

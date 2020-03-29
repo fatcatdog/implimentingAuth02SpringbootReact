@@ -7,6 +7,7 @@ import Home from './components/Home';
 import GroupList from './components/GroupList';
 import Group from './components/Group';
 import Contacts from './components/Contacts';
+import PrivateChat from './components/PrivateChat';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path='/groups' exact={true} component={GroupList} />
             <Route path='/group' exact={true} component={Group} />
             <Route path='/contacts' exact={true} component={Contacts} />
+            <Route path='/privateChat' exact={true} component={PrivateChat} />
           </Switch>
         </Router>
       </CookiesProvider>

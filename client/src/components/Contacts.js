@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-// import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../styles/Invitations.css';
 import { withCookies } from 'react-cookie';
 // import { getUserCredentialsEndpoint, getContactsSendeeEndpoint, getContactsSenderEndpoint, addAContactEndpoint, getCheckIfUserIsRealEndpoint } from '../constants';
@@ -17,7 +17,8 @@ function Contacts(props) {
   // const [senderInvites, setSenderInvites] = useState([]);
   // const [imageUrl, setImageUrl] = useState("");
 
-  const [sendeeObj, setSendeeObj] =  useState("");
+  const [newContact, setNewContact] =  useState("");
+  const [contacts, setContacts] = useState([]);
 
   async function confirmAuthenticated(){
     const {cookies} = props;
@@ -129,8 +130,16 @@ function Contacts(props) {
     //    }
     //  }
 
+    function addToTempContactList(){
+      let ourNewContact = {"id": contacts.length, "name": newContact}
+      setContacts(contacts => [...contacts, ourNewContact]);
+      localStorage.setItem('myContacts', (contacts));
+      setNewContact("");
+    }
+
     function handleSubmit(e){
       e.preventDefault();
+      addToTempContactList();
       // postOurObjToServer(csrfToken, sendeeObj);
       // getCheckIfUserIsRealFetch(csrfToken, sendeeObj);
 
@@ -140,6 +149,7 @@ function Contacts(props) {
 
   useEffect(() => {
     confirmAuthenticated();
+
   }, []);
 
   // function attemptToJoinInvite(ourInviteId, tempSender, tempStatus){
@@ -194,6 +204,25 @@ function Contacts(props) {
   //     </tr>
   // );
 
+  function handleContactClick(name) {
+    console.log("name name: " + name);
+  }
+
+  const contactsList = contacts.map((d) =>
+
+      <tr key = {d.id}>
+          <td>
+            <Link to={{
+              pathname: "/privateChat",
+              state: { chatPartner: d.name }
+            }}>{d.name}</Link>
+
+          </td>
+    </tr>
+
+
+  );
+
   return(
     <div>
     <div className="centeringStuff">
@@ -203,10 +232,9 @@ function Contacts(props) {
         <tbody>
         <tr>
           <th>Name</th>
-          <th>Date Connected</th>
-          <th>Chat</th>
         </tr>
         {/*{sendeeInvitationsList}{senderInvitationsList}*/}
+        {contactsList}
         </tbody>
       </table>
     </div>
@@ -219,8 +247,8 @@ function Contacts(props) {
           <br />
           <input className="field"
             type="text"
-            value={sendeeObj}
-            onChange={e => setSendeeObj(e.target.value)}
+            value={newContact}
+            onChange={e => setNewContact(e.target.value)}
           />
         </label>
         <br />
